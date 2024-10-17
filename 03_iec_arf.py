@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # with a lot of runs, using MT is *NOT* recommended
     sim.number_of_threads = 1
     sim.progress_bar = True
-    sim.output_dir = Path("output") / "03_iec_arf_200sec"
+    sim.output_dir = Path("output") / "03_iec_arf"
 
     # units
     sec = gate.g4_units.s

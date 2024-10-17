@@ -10,7 +10,7 @@ from opengate.contrib.spect.spect_helpers import (
     merge_several_heads_projections,
     extract_energy_window_from_projection_actors,
 )
-from opengate.examples.spect_pytomography.helpers import add_point_source
+from helpers import add_point_source
 
 if __name__ == "__main__":
 

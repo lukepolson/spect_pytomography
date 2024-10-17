@@ -3,7 +3,7 @@
 
 import click
 import SimpleITK as sitk
-from opengate.examples.spect_pytomography.old.spect_helpers import extract_energy_window
+from opengate.contrib.spect.spect_helpers import extract_energy_window_sitk
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"])
 
@@ -37,7 +37,9 @@ def go(input_files, energy_window, nb_of_energy_windows, nb_of_gantries):
     for ene in energy_windows:
         for input_file in input_files:
             img = sitk.ReadImage(input_file)
-            img = extract_energy_window(img, ene, nb_of_energy_windows, nb_of_gantries)
+            img = extract_energy_window_sitk(
+                img, ene, nb_of_energy_windows, nb_of_gantries
+            )
             sitk.WriteImage(
                 img,
                 input_file.replace(".mhd", f"_ene_{ene}.mhd"),
