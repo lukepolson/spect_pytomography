@@ -1,4 +1,7 @@
+# test00
 
+- simulation to generate a training database for the ARF
+- the trained arf net is used in test02 and test03
 
 # test01 
 
@@ -28,7 +31,3 @@ less particles (around x5 less) and scale the result to obtain similar variance 
 - same than test02 with ARF and IEC 6 spheres phantom
 
 
-# test00
-
-- simulation to generate a training database for the ARF
-- the trained arf net is used in test02 and test03
