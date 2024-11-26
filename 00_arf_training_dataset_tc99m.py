@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from pathlib import Path
 
+from pathlib import Path
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
 import opengate as gate
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     MeV = gate.g4_units.MeV
 
     # activity
-    activity = 1e8 * Bq / sim.number_of_threads
+    activity = 5e8 * Bq / sim.number_of_threads
     if sim.visu:
         sim.number_of_threads = 1
         activity = 1e3 * Bq
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     )
 
     # digitizer
-    digit = nm670.add_digitizer_tc99m(
+    digit = nm670.add_digitizer_tc99m_v2(
         sim, crystal, f"digitizer", spectrum_channel=False
     )
     ew = digit.find_module(f"digitizer_energy_window")
@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     # arf actor for building the training dataset
     detector_plane, arf = nm670.add_actor_for_arf_training_dataset(
-        sim, head, "ARF training", "lehr", ew, rr=50
+        sim, head, "ARF (training)", "lehr", ew, rr=50
     )
 
     # physics
@@ -77,4 +77,4 @@ if __name__ == "__main__":
     # print cmd line to train GARF
     pth_json = "pth/train_arf_v034.json"
     pth = "pth/arf_034_nm670_tc99m.pth"
-    print(f"garf_train {pth} {arf.get_output_path()} {pth}")
+    print(f"garf_train {pth_json} {arf.get_output_path()} {pth}")

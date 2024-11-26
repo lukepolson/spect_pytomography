@@ -4,11 +4,6 @@
 import opengate as gate
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
 from pathlib import Path
-import SimpleITK as sitk
-from opengate.contrib.spect.spect_helpers import (
-    merge_several_heads_projections,
-    extract_energy_window_from_projection_actors,
-)
 from helpers import add_point_source
 
 if __name__ == "__main__":
@@ -67,7 +62,7 @@ if __name__ == "__main__":
     # digitizer : probably not correct (yet)
     projs = []
     for i in range(2):
-        digit = nm670.add_digitizer_tc99m(
+        digit = nm670.add_digitizer_tc99m_v2(
             sim, crystals[i], f"digit_{i}", spectrum_channel=False
         )
         proj = digit.find_module(f"digit_{i}_projection")
@@ -96,13 +91,4 @@ if __name__ == "__main__":
     # go
     sim.run()
     print(stats)
-
-    # extract energy window images
-    energy_window = 1
-    filenames = extract_energy_window_from_projection_actors(
-        projs, energy_window=energy_window, nb_of_energy_windows=2, nb_of_gantries=n
-    )
-
-    # merge two heads
-    output_img = merge_several_heads_projections(filenames)
-    sitk.WriteImage(output_img, sim.output_dir / f"projections_ene_{energy_window}.mhd")
+    print(f"Projections saved in {[proj.get_output_path() for proj in projs]}")
