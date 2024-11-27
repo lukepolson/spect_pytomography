@@ -3,10 +3,9 @@
 
 import opengate as gate
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
-import opengate.contrib.phantoms.nemaiec as iec
+import opengate.contrib.phantoms.nemaiec as nemaiec
 from opengate.sources.base import set_source_rad_energy_spectrum
 from pathlib import Path
-from opengate.contrib.spect.ge_discovery_nm670 import add_arf_detector
 
 if __name__ == "__main__":
 
@@ -22,6 +21,9 @@ if __name__ == "__main__":
     sim.number_of_threads = 1
     sim.progress_bar = True
     sim.output_dir = Path("output") / "03_iec_arf"
+    sim.store_json_archive = True
+    sim.store_input_files = False
+    sim.json_archive_filename = "simu.json"
 
     # units
     sec = gate.g4_units.s
@@ -55,17 +57,17 @@ if __name__ == "__main__":
     spacing = [2.21 * mm * 2, 2.21 * mm * 2]
     size = [128, 128]
     pth = Path("pth") / "arf_034_nm670_tc99m_v2.pth"
-    det_plane1, arf1 = add_arf_detector(
+    det_plane1, arf1 = nm670.add_arf_detector(
         sim, radius, 0, size, spacing, "lehr", "detector", 1, pth
     )
-    det_plane2, arf2 = add_arf_detector(
+    det_plane2, arf2 = nm670.add_arf_detector(
         sim, radius, 180, size, spacing, "lehr", "detector", 2, pth
     )
     det_planes = [det_plane1, det_plane2]
     arfs = [arf1, arf2]
 
     # phantom
-    phantom = iec.add_iec_phantom(sim, name="phantom")
+    phantom = nemaiec.add_iec_phantom(sim, name="phantom")
 
     # physics
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option3"
@@ -74,7 +76,7 @@ if __name__ == "__main__":
 
     # add iec source
     activity_Bq_mL = [activity] * 6
-    sources = iec.add_spheres_sources(
+    sources = nemaiec.add_spheres_sources(
         sim, phantom.name, "sources", "all", activity_Bq_mL, verbose=True
     )
     total_activity = 0

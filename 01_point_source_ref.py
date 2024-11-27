@@ -20,6 +20,9 @@ if __name__ == "__main__":
     sim.number_of_threads = 1
     sim.progress_bar = True
     sim.output_dir = Path("output") / "01_point_source_ref"
+    sim.store_json_archive = True
+    sim.store_input_files = False
+    sim.json_archive_filename = "simu.json"
 
     # units
     sec = gate.g4_units.s

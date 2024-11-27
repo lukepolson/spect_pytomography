@@ -4,7 +4,6 @@
 import opengate as gate
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
 from pathlib import Path
-from opengate.contrib.spect.ge_discovery_nm670 import add_arf_detector
 from helpers import add_point_source
 
 if __name__ == "__main__":
@@ -21,6 +20,9 @@ if __name__ == "__main__":
     sim.number_of_threads = 1
     sim.progress_bar = True
     sim.output_dir = Path("output") / "02_point_source_arf"
+    sim.store_json_archive = True
+    sim.store_input_files = False
+    sim.json_archive_filename = "simu.json"
 
     # units
     sec = gate.g4_units.s
@@ -50,10 +52,10 @@ if __name__ == "__main__":
     spacing = [2.21 * mm * 2, 2.21 * mm * 2]
     size = [128, 128]
     pth = Path("pth") / "arf_034_nm670_tc99m_v2.pth"
-    det_plane1, arf1 = add_arf_detector(
+    det_plane1, arf1 = nm670.add_arf_detector(
         sim, radius, 0, size, spacing, "lehr", "detector", 1, pth
     )
-    det_plane2, arf2 = add_arf_detector(
+    det_plane2, arf2 = nm670.add_arf_detector(
         sim, radius, 180, size, spacing, "lehr", "detector", 2, pth
     )
     det_planes = [det_plane1, det_plane2]
