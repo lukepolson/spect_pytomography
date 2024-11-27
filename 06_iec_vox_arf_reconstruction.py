@@ -10,7 +10,7 @@ from opengate.contrib.spect.spect_helpers import read_projections_as_sinograms
 if __name__ == "__main__":
 
     # input folder
-    projections_folder = Path("output.save") / "03_iec_arf_200sec"
+    projections_folder = Path("output") / "05_iec_vox_arf"
 
     # input projections from GATE simulation (two heads)
     projections_filenames = ("projection_1.mhd", "projection_2.mhd")
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         "spacing": [4.42, 4.42, 4.42],
         "n_iters": 4,
         "n_subsets": 8,
-        "collimator_name": "SY-LEHR",
+        "collimator_name": "G8-LEHR",  # "SY-LEHR",
         "energy_kev": 140.5,
         "intrinsic_resolution_cm": 0.38,
     }

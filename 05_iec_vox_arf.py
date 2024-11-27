@@ -6,12 +6,8 @@ import opengate.contrib.spect.ge_discovery_nm670 as nm670
 import opengate.contrib.phantoms.nemaiec as nemaiec
 from opengate.sources.base import set_source_rad_energy_spectrum
 from pathlib import Path
-import SimpleITK as sitk
-from opengate.contrib.spect.ge_discovery_nm670 import add_arf_detector
-from opengate.contrib.spect.spect_helpers import (
-    merge_several_heads_projections,
-    extract_energy_window_from_projection_actors,
-)
+import numpy as np
+
 
 if __name__ == "__main__":
 
@@ -19,7 +15,7 @@ if __name__ == "__main__":
     sim = gate.Simulation()
 
     # main options
-    sim.visu = True  # uncomment to enable visualisation
+    # sim.visu = True # uncomment to enable visualisation
     sim.visu_type = "qt"
     # sim.visu_type = "vrml"
     sim.random_seed = "auto"
@@ -27,6 +23,9 @@ if __name__ == "__main__":
     sim.number_of_threads = 1
     sim.progress_bar = True
     sim.output_dir = Path("output") / "05_iec_vox_arf"
+    sim.store_json_archive = True
+    sim.store_input_files = False
+    sim.json_archive_filename = "simu.json"
 
     # units
     sec = gate.g4_units.s
@@ -42,7 +41,7 @@ if __name__ == "__main__":
     # options
     activity = 1e5 * BqmL / sim.number_of_threads
     n = 60
-    total_time = 200 * sec
+    total_time = 100 * sec
     radius = 20 * cm
 
     # visu
@@ -60,10 +59,10 @@ if __name__ == "__main__":
     spacing = [2.21 * mm * 2, 2.21 * mm * 2]
     size = [128, 128]
     pth = Path("pth") / "arf_034_nm670_tc99m_v2.pth"
-    det_plane1, arf1 = add_arf_detector(
+    det_plane1, arf1 = nm670.add_arf_detector(
         sim, radius, 0, size, spacing, "lehr", "detector", 1, pth
     )
-    det_plane2, arf2 = add_arf_detector(
+    det_plane2, arf2 = nm670.add_arf_detector(
         sim, radius, 180, size, spacing, "lehr", "detector", 2, pth
     )
     det_planes = [det_plane1, det_plane2]
@@ -84,13 +83,18 @@ if __name__ == "__main__":
 
     # add iec voxelized source
     # voxelize_iec_phantom -o data/iec_1mm.mha --spacing 1 --output_source data/iec_1mm_activity.mha -a 1 1 1 1 1 1
-    iec_vox_filename = Path("data") / "iec_1mm.mha"
-    iec_label_filename = Path("data") / "iec_1mm.json"
     iec_source_filename = Path("data") / "iec_1mm_activity.mha"
-    nemaiec.create_iec_phantom_source_vox(f, l, v)
     source = sim.add_source("VoxelSource", "src")
-    source.image = v
+    source.image = iec_source_filename
     source.position.translation = [0, 35 * mm, 0]
+    set_source_rad_energy_spectrum(source, "tc99m")
+    source.particle = "gamma"
+    source.direction.acceptance_angle.volumes = [h.name for h in det_planes]
+    source.direction.acceptance_angle.skip_policy = "SkipEvents"
+    source.direction.acceptance_angle.intersection_flag = True
+    _, volumes = nemaiec.get_default_sphere_centers_and_volumes()
+    source.activity = activity * np.array(volumes).sum()
+    print(f"Total activity is {source.activity/ Bq}")
 
     # add stat actor
     stats = sim.add_actor("SimulationStatisticsActor", "stats")
@@ -112,13 +116,3 @@ if __name__ == "__main__":
     # go
     sim.run()
     print(stats)
-
-    # extract energy window images
-    energy_window = 1
-    filenames = extract_energy_window_from_projection_actors(
-        arfs, energy_window=energy_window, nb_of_energy_windows=2, nb_of_gantries=n
-    )
-
-    # merge two heads
-    output_img = merge_several_heads_projections(filenames)
-    sitk.WriteImage(output_img, sim.output_dir / f"projections_ene_{energy_window}.mhd")

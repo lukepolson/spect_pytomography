@@ -1,0 +1,118 @@
+{
+    "iec": {
+        "label": 1,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_capillary_10mm": {
+        "label": 18,
+        "material": "G4_WATER"
+    },
+    "iec_capillary_13mm": {
+        "label": 20,
+        "material": "G4_WATER"
+    },
+    "iec_capillary_17mm": {
+        "label": 22,
+        "material": "G4_WATER"
+    },
+    "iec_capillary_22mm": {
+        "label": 24,
+        "material": "G4_WATER"
+    },
+    "iec_capillary_28mm": {
+        "label": 26,
+        "material": "G4_WATER"
+    },
+    "iec_capillary_37mm": {
+        "label": 28,
+        "material": "G4_WATER"
+    },
+    "iec_capillary_shell_10mm": {
+        "label": 17,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_capillary_shell_13mm": {
+        "label": 19,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_capillary_shell_17mm": {
+        "label": 21,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_capillary_shell_22mm": {
+        "label": 23,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_capillary_shell_28mm": {
+        "label": 25,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_capillary_shell_37mm": {
+        "label": 27,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_center_cylinder": {
+        "label": 3,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_center_cylinder_hole": {
+        "label": 4,
+        "material": "G4_LUNG_ICRP"
+    },
+    "iec_interior": {
+        "label": 2,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_10mm": {
+        "label": 16,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_13mm": {
+        "label": 14,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_17mm": {
+        "label": 12,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_22mm": {
+        "label": 10,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_28mm": {
+        "label": 8,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_37mm": {
+        "label": 6,
+        "material": "G4_WATER"
+    },
+    "iec_sphere_shell_10mm": {
+        "label": 15,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_sphere_shell_13mm": {
+        "label": 13,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_sphere_shell_17mm": {
+        "label": 11,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_sphere_shell_22mm": {
+        "label": 9,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_sphere_shell_28mm": {
+        "label": 7,
+        "material": "IEC_PLASTIC"
+    },
+    "iec_sphere_shell_37mm": {
+        "label": 5,
+        "material": "IEC_PLASTIC"
+    },
+    "world": {
+        "label": 0,
+        "material": "G4_AIR"
+    }
+}
