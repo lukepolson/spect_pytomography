@@ -3,14 +3,9 @@
 
 import opengate as gate
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
-import opengate.contrib.phantoms.nemaiec as iec
+import opengate.contrib.phantoms.nemaiec as nemaiec
+from opengate.sources.base import set_source_rad_energy_spectrum
 from pathlib import Path
-import SimpleITK as sitk
-from opengate.contrib.spect.ge_discovery_nm670 import add_arf_detector
-from opengate.contrib.spect.spect_helpers import (
-    merge_several_heads_projections,
-    extract_energy_window_from_projection_actors,
-)
 
 if __name__ == "__main__":
 
@@ -26,6 +21,9 @@ if __name__ == "__main__":
     sim.number_of_threads = 1
     sim.progress_bar = True
     sim.output_dir = Path("output") / "03_iec_arf"
+    sim.store_json_archive = True
+    sim.store_input_files = False
+    sim.json_archive_filename = "simu.json"
 
     # units
     sec = gate.g4_units.s
@@ -58,18 +56,18 @@ if __name__ == "__main__":
     # set the two spect heads
     spacing = [2.21 * mm * 2, 2.21 * mm * 2]
     size = [128, 128]
-    pth = Path("pth") / "arf_034_nm670_tc99m.pth"
-    det_plane1, arf1 = add_arf_detector(
+    pth = Path("pth") / "arf_034_nm670_tc99m_v2.pth"
+    det_plane1, arf1 = nm670.add_arf_detector(
         sim, radius, 0, size, spacing, "lehr", "detector", 1, pth
     )
-    det_plane2, arf2 = add_arf_detector(
+    det_plane2, arf2 = nm670.add_arf_detector(
         sim, radius, 180, size, spacing, "lehr", "detector", 2, pth
     )
     det_planes = [det_plane1, det_plane2]
     arfs = [arf1, arf2]
 
     # phantom
-    phantom = iec.add_iec_phantom(sim, name="phantom")
+    phantom = nemaiec.add_iec_phantom(sim, name="phantom")
 
     # physics
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option3"
@@ -78,12 +76,12 @@ if __name__ == "__main__":
 
     # add iec source
     activity_Bq_mL = [activity] * 6
-    sources = iec.add_spheres_sources(
+    sources = nemaiec.add_spheres_sources(
         sim, phantom.name, "sources", "all", activity_Bq_mL, verbose=True
     )
     total_activity = 0
     for source in sources:
-        gate.sources.generic.set_source_rad_energy_spectrum(source, "tc99m")
+        set_source_rad_energy_spectrum(source, "tc99m")
         source.particle = "gamma"
         source.direction.acceptance_angle.volumes = [h.name for h in det_planes]
         source.direction.acceptance_angle.skip_policy = "SkipEvents"
@@ -113,13 +111,3 @@ if __name__ == "__main__":
     # go
     sim.run()
     print(stats)
-
-    # extract energy window images
-    energy_window = 1
-    filenames = extract_energy_window_from_projection_actors(
-        arfs, energy_window=energy_window, nb_of_energy_windows=2, nb_of_gantries=n
-    )
-
-    # merge two heads
-    output_img = merge_several_heads_projections(filenames)
-    sitk.WriteImage(output_img, sim.output_dir / f"projections_ene_{energy_window}.mhd")

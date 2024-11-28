@@ -3,8 +3,11 @@
 
 import opengate as gate
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
+import opengate.contrib.phantoms.nemaiec as nemaiec
+from opengate.sources.base import set_source_rad_energy_spectrum
 from pathlib import Path
-from helpers import add_point_source
+import numpy as np
+
 
 if __name__ == "__main__":
 
@@ -19,7 +22,7 @@ if __name__ == "__main__":
     # with a lot of runs, using MT is *NOT* recommended
     sim.number_of_threads = 1
     sim.progress_bar = True
-    sim.output_dir = Path("output") / "02_point_source_arf"
+    sim.output_dir = Path("output") / "05_iec_vox_arf"
     sim.store_json_archive = True
     sim.store_input_files = False
     sim.json_archive_filename = "simu.json"
@@ -30,18 +33,22 @@ if __name__ == "__main__":
     cm = gate.g4_units.cm
     m = gate.g4_units.m
     Bq = gate.g4_units.Bq
+    kBq = Bq * 1e3
+    MBq = Bq * 1e6
+    cm3 = gate.g4_units.cm3
+    BqmL = Bq / cm3
 
     # options
-    activity = 2e5 * Bq / sim.number_of_threads
+    activity = 1e5 * BqmL / sim.number_of_threads
     n = 60
-    total_time = 200 * sec
-    radius = 16 * cm
+    total_time = 100 * sec
+    radius = 20 * cm
 
     # visu
     if sim.visu:
         total_time = 1 * sec
         sim.number_of_threads = 1
-        activity = 100 * Bq
+        activity = 1 * BqmL / sim.number_of_threads
 
     # world
     world = sim.world
@@ -61,12 +68,33 @@ if __name__ == "__main__":
     det_planes = [det_plane1, det_plane2]
     arfs = [arf1, arf2]
 
+    # phantom
+    # voxelize_iec_phantom -o data/iec_4mm.mha --spacing 4
+    iec_vox_filename = Path("data") / "iec_4mm.mha"
+    iec_label_filename = Path("data") / "iec_4mm.json"
+    phantom = nemaiec.add_iec_phantom_vox(
+        sim, "phantom", iec_vox_filename, iec_label_filename
+    )
+
     # physics
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option3"
     sim.physics_manager.set_production_cut("world", "all", 100 * mm)
+    sim.physics_manager.set_production_cut("phantom", "all", 5 * mm)
 
-    # add point source
-    source = add_point_source(sim, "src", det_planes, "tc99m", activity)
+    # add iec voxelized source
+    # voxelize_iec_phantom -o data/iec_1mm.mha --spacing 1 --output_source data/iec_1mm_activity.mha -a 1 1 1 1 1 1
+    iec_source_filename = Path("data") / "iec_1mm_activity.mha"
+    source = sim.add_source("VoxelSource", "src")
+    source.image = iec_source_filename
+    source.position.translation = [0, 35 * mm, 0]
+    set_source_rad_energy_spectrum(source, "tc99m")
+    source.particle = "gamma"
+    source.direction.acceptance_angle.volumes = [h.name for h in det_planes]
+    source.direction.acceptance_angle.skip_policy = "SkipEvents"
+    source.direction.acceptance_angle.intersection_flag = True
+    _, volumes = nemaiec.get_default_sphere_centers_and_volumes()
+    source.activity = activity * np.array(volumes).sum()
+    print(f"Total activity is {source.activity/ Bq}")
 
     # add stat actor
     stats = sim.add_actor("SimulationStatisticsActor", "stats")
