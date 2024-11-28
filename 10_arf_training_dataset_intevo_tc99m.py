@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # sim.visu = True
     sim.visu_type = "qt"
     sim.number_of_threads = 4
-    sim.output_dir = Path("output") / "00_arf_training_dataset_intevo"
+    sim.output_dir = Path("output") / "10_arf_training_dataset_intevo"
     sim.progress_bar = True
     sim.store_json_archive = True
     sim.store_input_files = False
