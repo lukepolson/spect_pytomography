@@ -30,6 +30,9 @@ if __name__ == "__main__":
     sinogram = sinograms[1]
     print(f"Projections size={sinogram.GetSize()} spacing={sinogram.GetSpacing()}")
 
+    # generate attenuation map
+    # ~/src/gate2/opengate/opengate/bin/opengate_photon_attenuation_image.py -i data/iec_1mm.mha -l data/iec_1mm.json 
+
     # osem reconstruction
     options = {
         "size": [128, 128, 128],
@@ -39,6 +42,7 @@ if __name__ == "__main__":
         "collimator_name": "G8-LEHR",  # "SY-LEHR",
         "energy_kev": 140.5,
         "intrinsic_resolution_cm": 0.38,
+        "attenuation_image": "mumap.mhd",
     }
     angles_deg = np.linspace(
         -start_angle, -start_angle + 360, nb_of_gantry_angles, endpoint=False
