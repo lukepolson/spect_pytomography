@@ -7,7 +7,9 @@ import numpy as np
 from pathlib import Path
 
 from opengate.image import resample_itk_image
-from opengate.contrib.dose.photon_attenuation_image_helpers import create_photon_attenuation_image
+from opengate.contrib.dose.photon_attenuation_image_helpers import (
+    create_photon_attenuation_image,
+)
 from opengate.contrib.spect.pytomography_helpers import osem_pytomography
 from opengate.contrib.spect.spect_helpers import read_projections_as_sinograms
 
@@ -37,10 +39,10 @@ if __name__ == "__main__":
     print(f"Projections size={sinogram.GetSize()} spacing={sinogram.GetSpacing()}")
 
     # generate attenuation map
-    # opengate_photon_attenuation_image -i data/iec_1mm.mha -l data/iec_1mm.json -o mumap.mhd
-    input_ct = Path("data")/ "iec_1mm.mha"
-    labels_filename = Path("data")/ "iec_1mm_labels.json"
-    material_database = Path("data")/ "iec_1mm.db"
+    # opengate_photon_attenuation_image -i data/iec_1mm.mhd -l data/iec_1mm.json -o mumap.mhd
+    input_ct = Path("data") / "iec_1mm.mhd"
+    labels_filename = Path("data") / "iec_1mm_labels.json"
+    material_database = Path("data") / "iec_1mm.db"
     attenuation_image = create_photon_attenuation_image(
         input_ct,
         labels_filename,
@@ -81,4 +83,4 @@ if __name__ == "__main__":
     SimpleITK.WriteImage(recon, output)
 
     print()
-    print(f"vv data/iec_1mm.mha --fusion {output}")
+    print(f"vv data/iec_1mm.mhd --fusion {output}")
