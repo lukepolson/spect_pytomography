@@ -4,6 +4,7 @@
 import opengate as gate
 import opengate.contrib.spect.ge_discovery_nm670 as nm670
 import opengate.contrib.phantoms.nemaiec as nemaiec
+from opengate.image import get_translation_to_isocenter
 from opengate.sources.base import set_source_rad_energy_spectrum
 from pathlib import Path
 import numpy as np
@@ -68,13 +69,20 @@ if __name__ == "__main__":
     det_planes = [det_plane1, det_plane2]
     arfs = [arf1, arf2]
 
+    # IEC voxelization
+    # voxelize_iec_phantom -o data/iec_1mm.mhd --spacing 1 --output_source data/iec_1mm_activity.mhd -a 1 1 1 1 1 1
+    # voxelize_iec_phantom -o data/iec_4.42mm.mhd --spacing 4.42 --output_source data/iec_4.42mm_activity.mhd -a 1 1 1 1 1 1
+    # voxelize_iec_phantom -o data/iec_4mm.mhd --spacing 4 --output_source data/iec_4mm_activity.mhd -a 1 1 1 1 1 1
+
     # phantom
-    # voxelize_iec_phantom -o data/iec_4mm.mha --spacing 4
-    iec_vox_filename = Path("data") / "iec_4mm.mha"
-    iec_label_filename = Path("data") / "iec_4mm.json"
-    phantom = nemaiec.add_iec_phantom_vox(
-        sim, "phantom", iec_vox_filename, iec_label_filename
-    )
+    iec_vox_filename = Path("data") / "iec_4mm.mhd"
+    iec_label_filename = Path("data") / "iec_4mm_labels.json"
+    db_filename = Path("data") / "iec_4mm.db"
+    vox = sim.add_volume("ImageVolume", "phantom")
+    vox.image = iec_vox_filename
+    vox.read_label_to_material(iec_label_filename)
+    vox.translation = get_translation_to_isocenter(vox.image)
+    sim.volume_manager.add_material_database(str(db_filename))
 
     # physics
     sim.physics_manager.physics_list_name = "G4EmStandardPhysics_option3"
@@ -82,8 +90,7 @@ if __name__ == "__main__":
     sim.physics_manager.set_production_cut("phantom", "all", 5 * mm)
 
     # add iec voxelized source
-    # voxelize_iec_phantom -o data/iec_1mm.mha --spacing 1 --output_source data/iec_1mm_activity.mha -a 1 1 1 1 1 1
-    iec_source_filename = Path("data") / "iec_1mm_activity.mha"
+    iec_source_filename = Path("data") / "iec_1mm_activity.mhd"
     source = sim.add_source("VoxelSource", "src")
     source.image = iec_source_filename
     source.position.translation = [0, 35 * mm, 0]
