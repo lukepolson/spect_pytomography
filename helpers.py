@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import opengate as gate
+from opengate.sources.base import set_source_rad_energy_spectrum
 
 
 def add_point_source(simulation, source_name, heads, rad, activity):
@@ -10,7 +11,7 @@ def add_point_source(simulation, source_name, heads, rad, activity):
 
     source = simulation.add_source("GenericSource", source_name)
     source.particle = "gamma"
-    gate.sources.generic.set_source_rad_energy_spectrum(source, rad)
+    set_source_rad_energy_spectrum(source, rad)
     source.position.type = "sphere"
     source.position.radius = 1 * mm
     source.position.translation = [5 * cm, 0, 0]
